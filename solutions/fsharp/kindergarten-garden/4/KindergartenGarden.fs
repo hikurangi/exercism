@@ -1,0 +1,22 @@
+﻿module KindergartenGarden
+
+type Plant =
+    | Radishes
+    | Clover
+    | Grass
+    | Violets
+
+let plants (diagram: string) (student: string) =
+    diagram.Split()
+    |> Seq.collect (
+        Seq.chunkBySize 2
+        >> Seq.item (int student.[0] - int 'A')
+        >> Seq.map
+            (function
+            | 'R' -> Radishes
+            | 'C' -> Clover
+            | 'G' -> Grass
+            | 'V' -> Violets
+            | _ -> failwith "Invalid plant type specified")
+    )
+    |> List.ofSeq
