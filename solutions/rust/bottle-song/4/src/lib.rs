@@ -1,0 +1,50 @@
+const SECOND_LINE: &str = "And if one green bottle should accidentally fall,\n";
+
+static NUMBER_TEXT: &[&str] = &[
+    "No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+];
+
+fn recite_rec(verses: String, current_bottles: u32, take_down: u32) -> String {
+    // TODO: use Numerics::default() converter instead of my own silly lookup, can work for any number!
+    let current_bottle_count_text = match current_bottles {
+        // TODO: ideally we would have this guard earlier, protecting the whole domain.
+        n if n > 0 => NUMBER_TEXT[n as usize],
+        _ => panic!("Invalid starting bottle count supplied: {current_bottles}"),
+    };
+    let current_plural_suffix = match current_bottles == 1 {
+        true => "",
+        false => "s",
+    };
+
+    // we're relying on the guard above to keep this number accurate.
+    // all this code is panic-prone but we're probably ok
+    let next_bottles = current_bottles.saturating_sub(1);
+    let next_bottle_count_text = NUMBER_TEXT[next_bottles as usize];
+    let next_plural_suffix = match next_bottles == 1 {
+        true => "",
+        false => "s",
+    };
+
+    let first_line = format!(
+        "{current_bottle_count_text} green bottle{current_plural_suffix} hanging on the wall,\n",
+    );
+    let final_line = format!(
+        "There'll be {count} green bottle{next_plural_suffix} hanging on the wall.",
+        count = next_bottle_count_text.to_lowercase(),
+    );
+
+    let updated_verses = format!("{verses}\n\n{first_line}{first_line}{SECOND_LINE}{final_line}");
+
+    match take_down == 1 {
+        true => updated_verses,
+        false => recite_rec(
+            updated_verses,
+            current_bottles.saturating_sub(1),
+            take_down.saturating_sub(1),
+        ),
+    }
+}
+
+pub fn recite(start_bottles: u32, take_down: u32) -> String {
+    recite_rec(String::new(), start_bottles, take_down)
+}
